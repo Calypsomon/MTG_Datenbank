@@ -1,0 +1,14 @@
+# Build outputs
+target/
+*.jar
+*.war
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Logs
+*.log

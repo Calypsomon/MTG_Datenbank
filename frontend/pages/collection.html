@@ -1,0 +1,93 @@
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>PackTheRipperCollection</title>
+
+  <link rel="stylesheet" href="../styles/style.css">
+
+
+</head>
+
+<body>
+
+<header>
+    <h1>Collection</h1>
+    <ul class="nav-list">
+        <li><a href="../index.html">about</a></li>
+        <li><a href="collection.html">collection</a></li>
+                 <li><a href="DeckBuilder.html">Decks</a></li>
+        <li><a href="ShopingCard.html">card</a></li>
+        <li><a href="admin.html">admin</a></li>
+    </ul>
+</header>
+
+<form id="searchForm" method="GET" action="/search">
+
+  <label>Farbe:</label>
+  <select id="color" name="color">
+    <option value="">Alle</option>
+    <option value="W">White</option>
+    <option value="U">Blue</option>
+    <option value="B">Black</option>
+    <option value="R">Red</option>
+    <option value="G">Green</option>
+  </select>
+
+  <label>Typ:</label>
+  <select id="type" name="type">
+    <option value="">Alle</option>
+    <option value="%Creature%">Creature</option>
+    <option value="%Instant%">Instant</option>
+    <option value="%Sorcery%">Sorcery</option>
+    <option value="%Enchantment%">Enchantment</option>
+    <option value="%Planeswalker%">Planeswalker</option>
+    <option value="%Legendary Creature%">Legendary Creature</option>
+    <option value="%Artifact%">Artifact</option>
+  </select>
+
+  <label>Seltenheit:</label>
+  <select id="rarity" name="rarity">
+    <option value="">Alle</option>
+    <option value="common">Common</option>
+    <option value="uncommon">Uncommon</option>
+    <option value="rare">Rare</option>
+    <option value="mythic">Mythic</option>
+  </select>
+
+  <label>Mana Value:</label>
+  <select id="ManaCost" name="ManaCost">
+    <option value="">Alle</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+  </select>
+
+  <input type="text" id="query" name="query" placeholder="Suche in Text...">
+
+  <button type="submit">Suchen</button>
+
+  <p id="CardCounttext"></p>
+
+</form id = "searchFrom">
+  
+
+<div id="collection-main">
+    <div id="collection"></div>
+</div>
+
+<footer>
+    <p>&copy; 2026 Pack The Ripper. Alle Rechte vorbehalten.</p>
+</footer>
+</body>
+<script src="../scripts/script.js" defer></script>
+</html>
