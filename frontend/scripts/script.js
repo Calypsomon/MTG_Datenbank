@@ -7,6 +7,7 @@ let filters = {
 };
 const host = "http://localhost:8080"; // noch nicht fertig implementiert 
 const shoppingCart = [];
+const HALTEDAUER = 1000;
 console.log("JS FILE LOADED");
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -102,6 +103,7 @@ async function loadCards() {
   const cards = await response.json();
 
   container.innerHTML = "";
+  document.getElementById("CardCounttext").textContent = cards.length + " Diffrent Cards!";
 
   cards.forEach(id => {
     const img = document.createElement("img");
@@ -121,18 +123,47 @@ async function loadCards() {
       img.style.background = "none";
     };
 
-    img.addEventListener("click", (e) => {
-      const card = e.currentTarget;
+    let timer;
 
-      card.style.transition = "filter 0.2s ease";
-      card.style.filter = "hue-rotate(90deg) brightness(1.3)";
+img.draggable = false;
+img.addEventListener("contextmenu", (e) => e.preventDefault());
 
-      setTimeout(() => {
-        card.style.filter = "none";
-      }, 200);
+img.addEventListener("pointerdown", () => {
+    // langsam verblassen als Feedback während des Haltens
+    img.style.transition = `opacity ${HALTEDAUER}ms linear`;
+    img.style.opacity = "0.01";
 
-      console.log("ID:", card.id);
-    });
+    timer = setTimeout(() => {
+        img.style.transition = "filter 0.2s ease";
+        img.style.filter = "hue-rotate(90deg) brightness(1.3)";
+
+        console.log("ID:", img.id);
+
+        fetch(host + `/api/cards/deleat/${img.id}`)
+            .then(response => {
+                if (response.ok) {
+                    console.log("Karte gelöscht:", img.id);
+                    //img.remove();
+                } else {
+                    console.error("Fehler:", response.status);
+                    abbrechen();
+                }
+            });
+    }, HALTEDAUER);
+});
+
+function abbrechen() {
+    clearTimeout(timer);
+    img.style.transition = "opacity 0.2s";
+    img.style.opacity = "1";
+    img.style.filter = "none";
+}
+
+img.addEventListener("pointerup", abbrechen);
+img.addEventListener("pointerleave", abbrechen);
+img.addEventListener("pointercancel", abbrechen);
+  
+  
 
     container.appendChild(img);
   });
@@ -155,9 +186,9 @@ document.getElementById("searchForm").addEventListener("submit", (e) => {
   searchbar();
 });
 
-async function getCardCount() {
-  const response = await fetch("http://localhost:8080/api/cards/count");
+/*async function getCardCount() {
+  const response = await fetch(host + "/api/cards/count");
   const cardCount = await response.json();
 
   document.getElementById("CardCounttext").textContent = cardCount + " Diffrent Cards!";
-}
+}*/

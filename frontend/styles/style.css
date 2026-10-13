@@ -105,12 +105,13 @@ h2 {
 
 .socials-list {
   display: grid;
+  align-items:  center;
   grid-auto-flow: column;
   grid-auto-columns: 103px;
   gap: 1px;
   grid-template-columns: repeat(auto-fit);
   position: relative;
-  bottom: 0;
+  bottom: 20;
   right: 0;
 }
 
@@ -316,3 +317,4 @@ footer {
 #DelButton{
    box-sizing: 2 2 8px rgba(241, 82, 34, 0.35);
 }
+

@@ -93,5 +93,8 @@ public CardData getData(@PathVariable String id) {
 public int getCardCount(){
     return CardRepository.getCardCount();
 }
-
+@GetMapping("/cards/deleat/{id}")
+public void deleteCard(@PathVariable String id){
+    CardRepository.deleteCard(id);
+}
 }

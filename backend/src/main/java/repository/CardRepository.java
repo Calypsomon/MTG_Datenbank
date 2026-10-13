@@ -95,9 +95,9 @@ for (Card card : Cards) {
     stmt.setString(29, image_normal);
     stmt.setString(30, purchase_cardmarket);
 
-    stmt.addBatch(); // 👈 wichtig!
+    stmt.addBatch(); 
     }
-    stmt.executeBatch(); // 👈 alles auf einmal
+    stmt.executeBatch(); 
     } catch (SQLException e) {
         throw new RuntimeException(e);
     }
@@ -105,6 +105,29 @@ for (Card card : Cards) {
 }
 
     public static void deleteCard(String id){
+        int x = 0;
+        try{
+        Connection connection = DriverManager.getConnection(
+            Config.URL,
+            Config.USERNAME,
+            Config.PASSWORD
+            );
+            String sql = """
+            SELECT count FROM card
+            WHERE id = ?
+            """;
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()){
+                 x = rs.getInt("count");
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }  
+
+        if(x<=1){
         try{
         Connection connection = DriverManager.getConnection(
             Config.URL,
@@ -113,7 +136,7 @@ for (Card card : Cards) {
             );
             String sql = """
             DELETE FROM card
-            WHERE id = ?;
+            WHERE id = ?
             """;
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1,id);
@@ -122,7 +145,26 @@ for (Card card : Cards) {
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }    
+        }} else {
+            try{
+        Connection connection = DriverManager.getConnection(
+            Config.URL,
+            Config.USERNAME,
+            Config.PASSWORD
+            );
+            String sql = """
+            UPDATE card set count = count -1
+            WHERE id = ?
+            """;
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1,id);
+            stmt.executeUpdate();
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        }   
     }
 
     public static void deleteAllCards(){
@@ -215,7 +257,7 @@ for (Card card : Cards) {
 
     public static List<String> getAllCards(CardFilter f){
         System.out.println("ALLCARDS AUSGEFÜHRT");
-            StringBuilder sql = new StringBuilder("SELECT id FROM card WHERE 1=1");
+            StringBuilder sql = new StringBuilder("SELECT id, count FROM card WHERE 1=1");
         List<Object> params = new ArrayList<>();
 
       if (f.Color().getFirst() != null && !f.Color().isEmpty()) {
