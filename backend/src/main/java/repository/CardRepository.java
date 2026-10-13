@@ -21,7 +21,7 @@ import model.CardData;
 import model.CardFilter;
 public class CardRepository {
     
-
+public record CardStack(String id, int count) {}
 
     public static void addBatch(List<Card> Cards){
         try{
@@ -104,7 +104,7 @@ for (Card card : Cards) {
 
 }
 
-    public static void deleteCard(String id){
+    public static int deleteCard(String id){
         int x = 0;
         try{
         Connection connection = DriverManager.getConnection(
@@ -165,6 +165,7 @@ for (Card card : Cards) {
             throw new RuntimeException(e);
         }
         }   
+        return x-1;
     }
 
     public static void deleteAllCards(){
@@ -255,7 +256,7 @@ for (Card card : Cards) {
         }    
     }
 
-    public static List<String> getAllCards(CardFilter f){
+    public static List<CardStack> getAllCards(CardFilter f){
         System.out.println("ALLCARDS AUSGEFÜHRT");
             StringBuilder sql = new StringBuilder("SELECT id, count FROM card WHERE 1=1");
         List<Object> params = new ArrayList<>();
@@ -290,14 +291,17 @@ for (Card card : Cards) {
             Config.USERNAME,
             Config.PASSWORD
             );
-            List<String> ret = new ArrayList<>();
+            List<CardStack> ret = new ArrayList<>();
             PreparedStatement stmt = connection.prepareStatement(sql.toString());
             for (int i = 0; i < params.size(); i++) {
                 stmt.setObject(i + 1, params.get(i));
             }
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-            ret.add(rs.getString(1));
+            ret.add(new CardStack(
+            rs.getString("id"),
+            rs.getInt("count")
+        ));
             }
             return ret;
         } catch (SQLException e) {

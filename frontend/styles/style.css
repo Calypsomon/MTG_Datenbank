@@ -318,3 +318,27 @@ footer {
    box-sizing: 2 2 8px rgba(241, 82, 34, 0.35);
 }
 
+.card-wrapper {
+  position: relative;
+  display: block;
+  width: fit-content;     
+  height: fit-content;
+  align-self: start;       
+  justify-self: center;    
+}
+
+.card-wrapper .card {
+  display: block;          
+  margin: 0;             
+}
+
+.badge {
+  position: absolute;
+  bottom: 186px;
+  left: 25px;
+  font-weight: 900;
+  background: rgba(60, 60, 60, 0.85);   /* grau, leicht durchsichtig */
+  border-radius: 4px;                    /* fast eckig, 0 = ganz eckig */
+  border: none;                          /* weißen Rand entfernen */
+  padding: 2px 8px;
+}

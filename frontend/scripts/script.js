@@ -7,14 +7,13 @@ let filters = {
 };
 const host = "http://localhost:8080"; // noch nicht fertig implementiert 
 const shoppingCart = [];
-const HALTEDAUER = 1000;
+const HALTEDAUER = 600;
 console.log("JS FILE LOADED");
 
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM READY");
 
     searchbar();
-    getCardCount();
     initDropzone();
     loadCards();
 });
@@ -96,26 +95,26 @@ async function loadCards() {
   if (filters.cmc !== null) params.append("cmc", filters.cmc);
   if (filters.oracle_text) params.append("oracle_text", filters.oracle_text);
 
-  const response = await fetch(
-    host + `/api/cards?${params.toString()}`
-  );
-
+  const response = await fetch(host + `/api/cards?${params.toString()}`);
   const cards = await response.json();
 
   container.innerHTML = "";
-  document.getElementById("CardCounttext").textContent = cards.length + " Diffrent Cards!";
+  document.getElementById("CardCounttext").textContent = cards.length + " Different Cards!";
 
-  cards.forEach(id => {
+  cards.forEach(card => {
+    // Wrapper für Bild + Zahl
+    const wrapper = document.createElement("div");
+    wrapper.className = "card-wrapper";
+
     const img = document.createElement("img");
-
     img.className = "card";
-    img.id = id;
+    img.draggable = false;
 
     img.style.background = "linear-gradient(90deg, #444, #666, #444)";
     img.style.backgroundSize = "200%";
     img.style.animation = "loading 1s infinite";
 
-    img.src = `${host}/api/card/image/${id}`;
+    img.src = `${host}/api/card/image/${card.id}`;
     img.loading = "lazy";
 
     img.onload = () => {
@@ -123,49 +122,55 @@ async function loadCards() {
       img.style.background = "none";
     };
 
+    // Zahl
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = card.count;
+    badge.hidden = card.count <= 1;
+
+    wrapper.append(img, badge);
+
+    // Long-Press
     let timer;
 
-img.draggable = false;
-img.addEventListener("contextmenu", (e) => e.preventDefault());
+    wrapper.addEventListener("contextmenu", (e) => e.preventDefault());
 
-img.addEventListener("pointerdown", () => {
-    // langsam verblassen als Feedback während des Haltens
-    img.style.transition = `opacity ${HALTEDAUER}ms linear`;
-    img.style.opacity = "0.01";
+    wrapper.addEventListener("pointerdown", () => {
+      img.style.transition = `opacity ${HALTEDAUER}ms linear`;
+      img.style.opacity = "0.01";
 
-    timer = setTimeout(() => {
-        img.style.transition = "filter 0.2s ease";
-        img.style.filter = "hue-rotate(90deg) brightness(1.3)";
+      timer = setTimeout(async () => {
+        const res = await fetch(host + `/api/cards/deleat/${card.id}`);
 
-        console.log("ID:", img.id);
+        if (!res.ok) {
+          console.error("Fehler:", res.status);
+          abbrechen();
+          return;
+        }
 
-        fetch(host + `/api/cards/deleat/${img.id}`)
-            .then(response => {
-                if (response.ok) {
-                    console.log("Karte gelöscht:", img.id);
-                    //img.remove();
-                } else {
-                    console.error("Fehler:", response.status);
-                    abbrechen();
-                }
-            });
-    }, HALTEDAUER);
-});
+        const neuerCount = await res.json();
 
-function abbrechen() {
-    clearTimeout(timer);
-    img.style.transition = "opacity 0.2s";
-    img.style.opacity = "1";
-    img.style.filter = "none";
-}
+        if (neuerCount <= 0) {
+          wrapper.remove();
+        } else {
+          badge.textContent = neuerCount;
+          badge.hidden = neuerCount <= 1;
+          abbrechen();
+        }
+      }, HALTEDAUER);
+    });
 
-img.addEventListener("pointerup", abbrechen);
-img.addEventListener("pointerleave", abbrechen);
-img.addEventListener("pointercancel", abbrechen);
-  
-  
+    function abbrechen() {
+      clearTimeout(timer);
+      img.style.transition = "opacity 0.2s";
+      img.style.opacity = "1";
+    }
 
-    container.appendChild(img);
+    wrapper.addEventListener("pointerup", abbrechen);
+    wrapper.addEventListener("pointerleave", abbrechen);
+    wrapper.addEventListener("pointercancel", abbrechen);
+
+    container.appendChild(wrapper);
   });
 }
 

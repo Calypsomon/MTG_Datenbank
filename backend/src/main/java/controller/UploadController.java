@@ -69,7 +69,7 @@ public ResponseEntity<byte[]> getImage(@PathVariable String id) {
 public class CardController{}
 
 @GetMapping("/cards")
-public List<String> getCards(
+public List<CardRepository.CardStack> getCards(
         @RequestParam(required = false) String color,
         @RequestParam(required = false) String type,
         @RequestParam(required = false) double cmc,
@@ -94,7 +94,7 @@ public int getCardCount(){
     return CardRepository.getCardCount();
 }
 @GetMapping("/cards/deleat/{id}")
-public void deleteCard(@PathVariable String id){
-    CardRepository.deleteCard(id);
+public int deleteCard(@PathVariable String id){
+    return CardRepository.deleteCard(id);
 }
 }
