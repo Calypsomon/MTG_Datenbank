@@ -5,7 +5,7 @@ let filters = {
   rarity: null,
   oracle_text: null
 };
-const host = "http://localhost:8080"; // noch nicht fertig implementiert 
+const host = "http://localhost:8080"; 
 const shoppingCart = [];
 const HALTEDAUER = 600;
 console.log("JS FILE LOADED");
@@ -13,20 +13,39 @@ console.log("JS FILE LOADED");
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM READY");
 
-    searchbar();
     initDropzone();
-    loadCards();
+
+    // Suche + Kartenliste gibt es nur auf der Sammlungsseite
+    const searchForm = document.getElementById("searchForm");
+    if (searchForm) {
+        searchForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            searchbar();
+        });
+    }
+    if (document.getElementById("collection")) {
+        waitForBackend().then(searchbar);
+    }
 });
+
+// In der Tauri-App startet das Backend parallel zum Fenster -> warten bis es antwortet
+async function waitForBackend(timeoutMs = 60000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    try {
+      const res = await fetch(host + "/api/cards/count");
+      if (res.ok) return;
+    } catch (e) {
+      // Backend noch nicht erreichbar
+    }
+    await new Promise(r => setTimeout(r, 500));
+  }
+  console.error("Backend nicht erreichbar");
+}
 
 // --------------------
 // DROPZONE
 // --------------------
-console.log("JS FILE LOADED");
-
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM READY");
-    initDropzone();
-});
 
 function initDropzone() {
     const dropzone = document.getElementById("dropzone");
@@ -72,7 +91,7 @@ function sendToBackend(file) {
     const formData = new FormData();
     formData.append("file", file);
 
-    fetch("http://localhost:8080/api/upload", {
+    fetch(host + "/api/upload", {
         method: "POST",
         body: formData
     })
@@ -186,10 +205,6 @@ function searchbar() {
 
   loadCards();
 }
-document.getElementById("searchForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  searchbar();
-});
 
 /*async function getCardCount() {
   const response = await fetch(host + "/api/cards/count");

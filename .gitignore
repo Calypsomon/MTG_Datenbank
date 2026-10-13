@@ -12,3 +12,15 @@ target/
 
 # Logs
 *.log
+
+# Node / Tauri
+node_modules/
+src-tauri/target/
+src-tauri/gen/
+# gebündelte Laufzeiten (groß, lokal erzeugen)
+src-tauri/resources/backend/
+src-tauri/resources/postgres/
+
+# Kompilierte Klassen
+*.class
+.env
